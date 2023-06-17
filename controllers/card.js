@@ -8,8 +8,9 @@ module.exports.getCards = (req, res) => {
 };
 
 module.exports.deleteCard = (req, res) => {
+  const { cardId } = req.params;
   Card
-    .findByIdAndRemove(req.params.id)
+    .findByIdAndRemove(cardId)
     .then((card) => {
       if (!card) {
         res.status(404).send({ message: 'Данные не найдены' });
@@ -17,7 +18,12 @@ module.exports.deleteCard = (req, res) => {
       }
       res.send({ data: card });
     })
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка на сервере' }));
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        return res.status(400).send({ message: 'Введены некорректные данные' });
+      }
+      return res.status(500).send({ message: 'Произошла ошибка на сервере' });
+    });
 };
 
 module.exports.createCard = (req, res) => {
