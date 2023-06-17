@@ -23,16 +23,15 @@ module.exports.deleteCard = (req, res) => {
 module.exports.createCard = (req, res) => {
   const { name, link } = req.body;
   Card
-    .create({ name, link })
+    .create({ name, link, owner: req.user._id })
     .then((card) => res.send({ data: card }))
     // eslint-disable-next-line no-console
     .then(() => console.log(req.user._id))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'Введены некорректные данные' });
-        return;
+        return res.status(400).send({ message: 'Введены некорректные данные' });
       }
-      res.status(500).send({ message: 'Произошла ошибка на сервере' });
+      return res.status(500).send({ message: 'Произошла ошибка на сервере' });
     });
 };
 
@@ -50,7 +49,7 @@ module.exports.likeCard = (req, res) => {
       res.send({ data: card });
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      if (err.name === 'CastError') {
         res.status(400).send({ message: 'Введены некорректные данные' });
         return;
       }
@@ -72,7 +71,7 @@ module.exports.dislikeCard = (req, res) => {
       res.send({ data: card });
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      if (err.name === 'CastError') {
         res.status(400).send({ message: 'Введены некорректные данные' });
         return;
       }
