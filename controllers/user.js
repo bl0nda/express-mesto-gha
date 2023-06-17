@@ -16,7 +16,11 @@ module.exports.getUserById = (req, res) => {
       }
       res.send({ data: user });
     })
-    .catch(() => {
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(400).send({ message: 'Введены некорректные данные' });
+        return;
+      }
       res.status(500).send({ message: 'Произошла ошибка на сервере' });
     });
 };
@@ -36,38 +40,44 @@ module.exports.createUser = (req, res) => {
 
 module.exports.updateUser = (req, res) => {
   const { name, about } = req.body;
-  User.findByIdAndUpdate(req.user._id, { name, about })
+  User.findByIdAndUpdate(req.user._id, { name, about }, {
+    new: true,
+    runValidators: true,
+    upsert: true,
+  })
     .then((user) => {
       if (!user) {
-        res.status(404).sens({ message: 'Пользователь не найден' });
+        res.status(404).send({ message: 'Пользователь не найден' });
         return;
       }
       res.send({ data: user });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'Введены некорректные данные' });
-        return;
+        return res.status(400).send({ message: 'Введены некорректные данные' });
       }
-      res.status(500).send({ message: 'Произошла ошибка на сервере' });
+      return res.status(500).send({ message: 'Произошла ошибка на сервере' });
     });
 };
 
 module.exports.updateAvatar = (req, res) => {
   const { avatar } = req.body;
-  User.findByIdAndUpdate(req.user._id, { avatar })
+  User.findByIdAndUpdate(req.user._id, { avatar }, {
+    new: true,
+    runValidators: true,
+    upsert: true,
+  })
     .then((user) => {
       if (!user) {
-        res.status(404).sens({ message: 'Пользователь не найден' });
+        res.status(404).send({ message: 'Пользователь не найден' });
         return;
       }
       res.send({ data: user });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'Введены некорректные данные' });
-        return;
+        return res.status(400).send({ message: 'Введены некорректные данные' });
       }
-      res.status(500).send({ message: 'Произошла ошибка на сервере' });
+      return res.status(500).send({ message: 'Произошла ошибка на сервере' });
     });
 };
