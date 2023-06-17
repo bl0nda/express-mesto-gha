@@ -12,7 +12,7 @@ module.exports.deleteCard = (req, res) => {
     .findByIdAndRemove(req.params.id)
     .then((card) => {
       if (!card) {
-        res.status(404).sens({ message: 'Данные не найдены' });
+        res.status(404).send({ message: 'Данные не найдены' });
         return;
       }
       res.send({ data: card });
@@ -44,7 +44,7 @@ module.exports.likeCard = (req, res) => {
   )
     .then((card) => {
       if (!card) {
-        res.status(404).sens({ message: 'Данные не найдены' });
+        res.status(404).send({ message: 'Данные не найдены' });
         return;
       }
       res.send({ data: card });
@@ -66,7 +66,7 @@ module.exports.dislikeCard = (req, res) => {
   )
     .then((card) => {
       if (!card) {
-        res.status(404).sens({ message: 'Данные не найдены' });
+        res.status(404).send({ message: 'Данные не найдены' });
         return;
       }
       res.send({ data: card });
