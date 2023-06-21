@@ -9,19 +9,17 @@ module.exports.getUsers = (req, res) => {
 module.exports.getUserById = (req, res) => {
   const { userId } = req.params;
   User.findById(userId)
+    .orFail(new Error('NotFound'))
     .then((user) => {
-      if (!user) {
-        res.status(404).send({ message: 'Пользователь не найден' });
-        return;
-      }
-      res.send({ data: user });
+      res.status(200).send({ data: user });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Введены некорректные данные' });
-        return;
+        return res.status(400).send({ message: 'Введены некорректные данные' });
+      } if (err.name === 'NotFound') {
+        return res.status(404).send({ message: 'Пользователь не найден' });
       }
-      res.status(500).send({ message: 'Произошла ошибка на сервере' });
+      return res.status(500).send({ message: 'Произошла ошибка на сервере' });
     });
 };
 
@@ -50,16 +48,15 @@ module.exports.updateUser = (req, res) => {
         upsert: true,
       },
     )
+    .orFail(new Error('NotFound'))
     .then((user) => {
-      if (!user) {
-        res.status(404).send({ message: 'Пользователь не найден' });
-        return;
-      }
-      res.send({ data: user });
+      res.status(200).send({ data: user });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
         return res.status(400).send({ message: 'Введены некорректные данные' });
+      } if (err.name === 'NotFound') {
+        return res.status(404).send({ message: 'Пользователь не найден' });
       }
       return res.status(500).send({ message: 'Произошла ошибка на сервере' });
     });
@@ -71,16 +68,15 @@ module.exports.updateAvatar = (req, res) => {
     new: true,
     runValidators: true,
   })
+    .orFail(new Error('NotFound'))
     .then((user) => {
-      if (!user) {
-        res.status(404).send({ message: 'Пользователь не найден' });
-        return;
-      }
-      res.send({ data: user });
+      res.status(200).send({ data: user });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
         return res.status(400).send({ message: 'Введены некорректные данные' });
+      } if (err.name === 'NotFound') {
+        return res.status(404).send({ message: 'Пользователь не найден' });
       }
       return res.status(500).send({ message: 'Произошла ошибка на сервере' });
     });

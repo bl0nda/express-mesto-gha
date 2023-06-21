@@ -11,16 +11,15 @@ module.exports.deleteCard = (req, res) => {
   const { cardId } = req.params;
   Card
     .findByIdAndRemove(cardId)
+    .orFail(new Error('NotFound'))
     .then((card) => {
-      if (!card) {
-        res.status(404).send({ message: 'Данные не найдены' });
-        return;
-      }
-      res.send({ data: card });
+      res.status(200).send({ data: card });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
         return res.status(400).send({ message: 'Введены некорректные данные' });
+      } if (err.name === 'NotFound') {
+        return res.status(404).send({ message: 'Данные не найдены' });
       }
       return res.status(500).send({ message: 'Произошла ошибка на сервере' });
     });
@@ -47,19 +46,18 @@ module.exports.likeCard = (req, res) => {
     { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
     { new: true },
   )
+    .orFail(new Error('NotFound'))
     .then((card) => {
-      if (!card) {
-        res.status(404).send({ message: 'Данные не найдены' });
-        return;
-      }
-      res.send({ data: card });
+      res.status(200).send({ data: card });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Введены некорректные данные' });
-        return;
+        return res.status(400).send({ message: 'Введены некорректные данные' });
       }
-      res.status(500).send({ message: 'Произошла ошибка на сервере' });
+      if (err.name === 'NotFound') {
+        return res.status(404).send({ message: 'Данные не найдены' });
+      }
+      return res.status(500).send({ message: 'Произошла ошибка на сервере' });
     });
 };
 
@@ -69,18 +67,16 @@ module.exports.dislikeCard = (req, res) => {
     { $pull: { likes: req.user._id } }, // убрать _id из массива
     { new: true },
   )
+    .orFail(new Error('NotFound'))
     .then((card) => {
-      if (!card) {
-        res.status(404).send({ message: 'Данные не найдены' });
-        return;
-      }
-      res.send({ data: card });
+      res.status(200).send({ data: card });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Введены некорректные данные' });
-        return;
+        return res.status(400).send({ message: 'Введены некорректные данные' });
+      } if (err.name === 'NotFound') {
+        return res.status(404).send({ message: 'Данные не найдены' });
       }
-      res.status(500).send({ message: 'Произошла ошибка на сервере' });
+      return res.status(500).send({ message: 'Произошла ошибка на сервере' });
     });
 };
