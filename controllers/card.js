@@ -18,7 +18,7 @@ module.exports.deleteCard = (req, res) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         return res.status(400).send({ message: 'Введены некорректные данные' });
-      } if (err.name === 'NotFound') {
+      } if (err.message === 'NotFound') {
         return res.status(404).send({ message: 'Данные не найдены' });
       }
       return res.status(500).send({ message: 'Произошла ошибка на сервере' });
@@ -54,7 +54,7 @@ module.exports.likeCard = (req, res) => {
       if (err.name === 'CastError') {
         return res.status(400).send({ message: 'Введены некорректные данные' });
       }
-      if (err.name === 'NotFound') {
+      if (err.message === 'NotFound') {
         return res.status(404).send({ message: 'Данные не найдены' });
       }
       return res.status(500).send({ message: 'Произошла ошибка на сервере' });
@@ -74,7 +74,7 @@ module.exports.dislikeCard = (req, res) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         return res.status(400).send({ message: 'Введены некорректные данные' });
-      } if (err.name === 'NotFound') {
+      } if (err.message === 'NotFound') {
         return res.status(404).send({ message: 'Данные не найдены' });
       }
       return res.status(500).send({ message: 'Произошла ошибка на сервере' });

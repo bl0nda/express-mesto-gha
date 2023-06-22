@@ -16,7 +16,7 @@ module.exports.getUserById = (req, res) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         return res.status(400).send({ message: 'Введены некорректные данные' });
-      } if (err.name === 'NotFound') {
+      } if (err.message === 'NotFound') {
         return res.status(404).send({ message: 'Пользователь не найден' });
       }
       return res.status(500).send({ message: 'Произошла ошибка на сервере' });
@@ -55,7 +55,7 @@ module.exports.updateUser = (req, res) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         return res.status(400).send({ message: 'Введены некорректные данные' });
-      } if (err.name === 'NotFound') {
+      } if (err.message === 'NotFound') {
         return res.status(404).send({ message: 'Пользователь не найден' });
       }
       return res.status(500).send({ message: 'Произошла ошибка на сервере' });
@@ -75,7 +75,7 @@ module.exports.updateAvatar = (req, res) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         return res.status(400).send({ message: 'Введены некорректные данные' });
-      } if (err.name === 'NotFound') {
+      } if (err.message === 'NotFound') {
         return res.status(404).send({ message: 'Пользователь не найден' });
       }
       return res.status(500).send({ message: 'Произошла ошибка на сервере' });
