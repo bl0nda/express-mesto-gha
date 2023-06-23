@@ -45,7 +45,6 @@ module.exports.updateUser = (req, res) => {
       {
         new: true,
         runValidators: true,
-        upsert: true,
       },
     )
     .orFail(new Error('NotFound'))
