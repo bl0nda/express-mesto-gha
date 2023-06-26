@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const { errors } = require('celebrate');
 
 const { PORT = 3000 } = process.env;
 
@@ -8,7 +9,9 @@ const app = express();
 
 const helmet = require('helmet');
 
+const { createUser, login } = require('./controllers/user');
 const router = require('./routes/index');
+const auth = require('./middlewares/auth');
 
 mongoose.connect('mongodb://127.0.0.1:27017/mestodb')
   .then(() => {
@@ -19,14 +22,12 @@ mongoose.connect('mongodb://127.0.0.1:27017/mestodb')
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(helmet());
+app.use(errors());
 
-app.use((req, res, next) => {
-  req.user = {
-    _id: '648e25ba442daf0ba1c57115', // вставьте сюда _id созданного в предыдущем пункте пользователя
-  };
+app.post('/signin', login);
+app.post('/signup', createUser);
 
-  next();
-});
+app.use(auth);
 
 app.use(router);
 
