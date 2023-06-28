@@ -27,18 +27,18 @@ app.use(errors());
 
 app.post('/signin', celebrate({
   body: Joi.object().keys({
-    email: Joi.string().required().email().pattern(/^([a-z0-9_\.-]+)@([a-z0-9_\.-]+)\.([a-z\.]{2,6})$/),
+    email: Joi.string().required().email(),
     password: Joi.string().required().min(8),
   }),
 }), login);
 
 app.post('/signup', celebrate({
   body: Joi.object().keys({
-    email: Joi.string().required().email().pattern(/^([a-z0-9_\.-]+)@([a-z0-9_\.-]+)\.([a-z\.]{2,6})$/),
+    email: Joi.string().required().email(),
     password: Joi.string().required().min(8),
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),
-    avatar: Joi.string().pattern(),
+    avatar: Joi.string().pattern(/^https?:\/\/(www\.)?[a-z0-9\-._~:\/?#[\]@!$&'()*+,;=]+\.[a-z0-9\-._~:\/?#[\]@!$&'()*+,;=]+#?/),
   }),
 }), createUser);
 
