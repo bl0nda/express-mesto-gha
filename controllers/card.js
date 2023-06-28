@@ -1,13 +1,16 @@
 const Card = require('../models/card');
 
-module.exports.getCards = (req, res) => {
+const ValidationError = require('../errors/validation-err');
+const NotFoundError = require('../errors/not-found-err');
+
+module.exports.getCards = (req, res, next) => {
   Card
     .find({})
     .then((card) => res.send({ data: card }))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка на сервере' }));
+    .catch(next);
 };
 
-module.exports.deleteCard = (req, res) => {
+module.exports.deleteCard = (req, res, next) => {
   const { cardId } = req.params;
   Card
     .findByIdAndRemove(cardId)
@@ -17,15 +20,15 @@ module.exports.deleteCard = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        return res.status(400).send({ message: 'Введены некорректные данные' });
+        throw new ValidationError('Введены некорректные данные');
       } if (err.message === 'NotFound') {
-        return res.status(404).send({ message: 'Данные не найдены' });
+        return next(new NotFoundError('Объект не найден'));
       }
-      return res.status(500).send({ message: 'Произошла ошибка на сервере' });
+      return next(err);
     });
 };
 
-module.exports.createCard = (req, res) => {
+module.exports.createCard = (req, res, next) => {
   const { name, link } = req.body;
   Card
     .create({ name, link, owner: req.user._id })
@@ -34,13 +37,13 @@ module.exports.createCard = (req, res) => {
     .then(() => console.log(req.user._id))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return res.status(400).send({ message: 'Введены некорректные данные' });
+        throw new ValidationError('Введены некорректные данные');
       }
-      return res.status(500).send({ message: 'Произошла ошибка на сервере' });
+      return next(err);
     });
 };
 
-module.exports.likeCard = (req, res) => {
+module.exports.likeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
@@ -52,16 +55,15 @@ module.exports.likeCard = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        return res.status(400).send({ message: 'Введены некорректные данные' });
+        throw new ValidationError('Введены некорректные данные');
+      } if (err.message === 'NotFound') {
+        return next(new NotFoundError('Данные не найдены'));
       }
-      if (err.message === 'NotFound') {
-        return res.status(404).send({ message: 'Данные не найдены' });
-      }
-      return res.status(500).send({ message: 'Произошла ошибка на сервере' });
+      return next(err);
     });
 };
 
-module.exports.dislikeCard = (req, res) => {
+module.exports.dislikeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $pull: { likes: req.user._id } }, // убрать _id из массива
@@ -73,10 +75,10 @@ module.exports.dislikeCard = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        return res.status(400).send({ message: 'Введены некорректные данные' });
+        throw new ValidationError('Введены некорректные данные');
       } if (err.message === 'NotFound') {
-        return res.status(404).send({ message: 'Данные не найдены' });
+        return next(new NotFoundError('Данные не найдены'));
       }
-      return res.status(500).send({ message: 'Произошла ошибка на сервере' });
+      return next(err);
     });
 };
