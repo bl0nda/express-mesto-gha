@@ -2,6 +2,7 @@ const Card = require('../models/card');
 
 const ValidationError = require('../errors/validation-err');
 const NotFoundError = require('../errors/not-found-err');
+const ForbiddenError = require('../errors/forbidden-err');
 
 module.exports.getCards = (req, res, next) => {
   Card
@@ -13,16 +14,23 @@ module.exports.getCards = (req, res, next) => {
 module.exports.deleteCard = (req, res, next) => {
   const { cardId } = req.params;
   Card
-    .findByIdAndRemove(cardId)
-    .orFail(new Error('NotFound'))
+    .findById(cardId)
     .then((card) => {
-      res.status(200).send({ data: card });
+      if (!card) {
+        throw new NotFoundError('Карточка не найдена');
+      }
+      if (card.owner.toString() !== req.user._id) {
+        throw new ForbiddenError('Нельзя удалять чужую карточку!');
+      }
+      Card.findByIdAndRemove(cardId)
+        // eslint-disable-next-line no-shadow
+        .then((card) => {
+          res.status(200).send({ data: card });
+        });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
         throw new ValidationError('Введены некорректные данные');
-      } if (err.message === 'NotFound') {
-        return next(new NotFoundError('Объект не найден'));
       }
       return next(err);
     });
