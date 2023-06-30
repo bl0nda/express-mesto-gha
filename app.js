@@ -25,9 +25,9 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(helmet());
 
-app.post('/signin', loginValidation, login);
-
 app.post('/signup', createUserValidation, createUser);
+
+app.post('/signin', loginValidation, login);
 
 app.use(auth);
 
@@ -38,7 +38,7 @@ app.use(errors());
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
   const { statusCode = 500, message } = err;
-
+  // console.error(err);
   res
     .status(statusCode)
     .send({
