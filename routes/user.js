@@ -9,9 +9,9 @@ const { getUserByIdValidation, updateUserValidation, updateAvatarValidation } = 
 
 userRouter.get('/users', getUsers);
 
-userRouter.get('/users/:userId', getUserByIdValidation, getUserById);
+userRouter.get('/users/me', getCurrentUser);
 
-userRouter.get('users/me', getCurrentUser);
+userRouter.get('/users/:userId', getUserByIdValidation, getUserById);
 
 userRouter.patch('/users/me', updateUserValidation, updateUser);
 
