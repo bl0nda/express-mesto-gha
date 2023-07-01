@@ -52,28 +52,30 @@ module.exports.createCard = (req, res, next) => {
 };
 
 module.exports.likeCard = (req, res, next) => {
+  const cardId = req.params._id;
   Card.findByIdAndUpdate(
-    req.params.cardId,
+    cardId,
     { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
     { new: true },
   )
-    .orFail(new Error('NotFound'))
     .then((card) => {
+      if (!card) {
+        throw new NotFoundError('Данные не найдены');
+      }
       res.status(200).send({ data: card });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
         throw new ValidationError('Введены некорректные данные');
-      } if (err.message === 'NotFound') {
-        return next(new NotFoundError('Данные не найдены'));
       }
       return next(err);
     });
 };
 
 module.exports.dislikeCard = (req, res, next) => {
+  const cardId = req.params._id;
   Card.findByIdAndUpdate(
-    req.params.cardId,
+    cardId,
     { $pull: { likes: req.user._id } }, // убрать _id из массива
     { new: true },
   )
