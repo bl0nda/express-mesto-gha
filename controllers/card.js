@@ -52,7 +52,7 @@ module.exports.createCard = (req, res, next) => {
 };
 
 module.exports.likeCard = (req, res, next) => {
-  const cardId = req.params;
+  const { cardId } = req.params;
   Card.findByIdAndUpdate(
     cardId,
     { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
@@ -73,7 +73,7 @@ module.exports.likeCard = (req, res, next) => {
 };
 
 module.exports.dislikeCard = (req, res, next) => {
-  const cardId = req.params;
+  const { cardId } = req.params;
   Card.findByIdAndUpdate(
     cardId,
     { $pull: { likes: req.user._id } }, // убрать _id из массива
