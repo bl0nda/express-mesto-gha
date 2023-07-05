@@ -1,4 +1,3 @@
-/* eslint-disable no-useless-escape */
 const userRouter = require('express').Router();
 
 const {

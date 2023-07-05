@@ -1,4 +1,3 @@
-/* eslint-disable no-useless-escape */
 const cardsRouter = require('express').Router();
 
 const {

@@ -22,10 +22,9 @@ module.exports.deleteCard = (req, res, next) => {
       if (card.owner.toString() !== req.user._id) {
         throw new ForbiddenError('Нельзя удалять чужую карточку!');
       }
-      Card.findByIdAndRemove(cardId)
-        // eslint-disable-next-line no-shadow
-        .then((card) => {
-          res.status(200).send({ data: card });
+      return Card.findByIdAndRemove(cardId)
+        .then((obj) => {
+          res.status(200).send({ data: obj });
         });
     })
     .catch((err) => {
@@ -40,9 +39,8 @@ module.exports.createCard = (req, res, next) => {
   const { name, link } = req.body;
   Card
     .create({ name, link, owner: req.user._id })
-    .then((card) => res.send({ data: card }))
-    // eslint-disable-next-line no-console
-    .then(() => console.log(req.user._id))
+    .then((card) => res.status(201).send({ data: card }))
+    // .then(() => console.log(req.user._id))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         throw new ValidationError('Введены некорректные данные');

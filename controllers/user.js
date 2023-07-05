@@ -27,9 +27,7 @@ module.exports.getCurrentUser = (req, res, next) => {
 module.exports.getUserById = (req, res, next) => {
   const { userId } = req.params;
   User.findById(userId)
-    .orFail(() => {
-      throw new NotFoundError('Пользователь не найден');
-    })
+    .orFail(() => next(new NotFoundError('Пользователь не найден')))
     .then((user) => {
       res.status(200).send({ data: user });
     })
@@ -80,9 +78,7 @@ module.exports.updateUser = (req, res, next) => {
         runValidators: true,
       },
     )
-    .orFail(() => {
-      throw new NotFoundError('Пользователь не найден');
-    })
+    .orFail(() => next(new NotFoundError('Пользователь не найден')))
     .then((user) => {
       res.status(200).send({ data: user });
     })
@@ -100,15 +96,15 @@ module.exports.updateAvatar = (req, res, next) => {
     new: true,
     runValidators: true,
   })
-    .orFail(new Error('NotFound'))
+    .orFail(() => {
+      throw new NotFoundError('Пользователь не найден');
+    })
     .then((user) => {
       res.status(200).send({ data: user });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
         throw new ValidationError('Введены некорректные данные');
-      } if (err.message === 'NotFound') {
-        return next(new NotFoundError('Пользователь не найден'));
       }
       return next(err);
     });
